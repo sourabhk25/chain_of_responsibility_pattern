@@ -81,26 +81,46 @@ class Dispenser50 implements IDispenser {
 
 // A dispenser of $100 notes
 class Dispenser100 implements IDispenser {
-    //code here
+    // Dispenses $50s if applicable, otherwise continues to next successor
+    successor: IDispenser | undefined
 
+    nextSuccessor(successor: IDispenser): void {
+        // Set the next successor
+        this.successor = successor
+    }
+
+    handle(amount: number): void {
+        // Handle the dispensing of notes"
+        if (amount >= 100) {
+            const num = Math.floor(amount / 100)
+            const remainder = amount % 100
+            console.log('Dispensing ' + num  + ' $100 note')
+            if (remainder !== 0) {
+                ;(this.successor as IDispenser).handle(remainder)
+            }
+        } else {
+            ;(this.successor as IDispenser).handle(amount)
+        }
+    }
 }
 
 // The ATM Dispenser Chain
 class ATMDispenserChain {
-    chain1: Dispenser50
-    chain2: Dispenser20
-    chain3: Dispenser10
+    chain1: Dispenser100
+    chain2: Dispenser50
+    chain3: Dispenser20
+    chain4: Dispenser10
 
     constructor() {
-        // initializing the successors chain
-        this.chain1 = new Dispenser50()
-        this.chain2 = new Dispenser20()
-        this.chain3 = new Dispenser10()
-        // Setting a default successor chain that will process the 50s first,
-        // the 20s second and the 10s last.The successor chain will be
-        // recalculated dynamically at runtime.
+        this.chain1 = new Dispenser100()
+        this.chain2 = new Dispenser50()
+        this.chain3 = new Dispenser20()
+        this.chain4 = new Dispenser10()
+
+        // Setting the successor chain starting from the dispenser for $100 notes
         this.chain1.nextSuccessor(this.chain2)
         this.chain2.nextSuccessor(this.chain3)
+        this.chain3.nextSuccessor(this.chain4)
     }
 }
 
